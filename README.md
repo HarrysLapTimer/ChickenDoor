@@ -33,7 +33,7 @@ Start with setting up your Arduino environment. When using the electronic parts 
 
 chickendoor is based on the **Bolbro library** my projects are based on. It comes with a number of convenience functions including WiFi, preference, time, web server, and log handling. 
 
--  copy library/Bolbro to your Arduino library directory; on macOS, this is ~/Documents/Arduino/libraries
+-  copy `library/Bolbro` to your Arduino library directory; on macOS, this is `~/Documents/Arduino/libraries`
 -  restart Arduino IDE afterwards
 
 Now, you are ready to compile and flash the sketch. `chickendoor` requires a customization to work:
