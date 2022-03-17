@@ -536,26 +536,45 @@ static boolean connectNetwork(const char *ssid, const char *password) {
 
 void BolbroClass::onWiFiEvent(WiFiEvent_t event) {
 
+#ifdef ESP_PLATFORM // ESP32
+
     switch(event) {
         case ARDUINO_EVENT_WIFI_STA_START:
         	if (mAppNameLowerCase)
             	WiFi.setHostname(mAppNameLowerCase);
             break;
-        case ARDUINO_EVENT_WIFI_STA_CONNECTED:
+        case ARDUINO_EVENT_WIFI_STA_CONNECTED: // WIFI_EVENT_STAMODE_CONNECTED
             WiFi.enableIpV6();
 			publishDNSName();
             break;
         case ARDUINO_EVENT_WIFI_STA_GOT_IP6:
             Serial.printf("IP6 address: %s\n", WiFi.localIPv6().toString().c_str());
             break;
-        case ARDUINO_EVENT_WIFI_STA_GOT_IP:
+        case ARDUINO_EVENT_WIFI_STA_GOT_IP: // WIFI_EVENT_STAMODE_GOT_IP
 			Serial.printf("IP address: %s\n", WiFi.localIP().toString().c_str());
             break;
-        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED:
+        case ARDUINO_EVENT_WIFI_STA_DISCONNECTED: // WIFI_EVENT_STAMODE_DISCONNECTED
             break;
         default:
             break;
     }
+
+#else
+
+    switch(event) {
+        case WIFI_EVENT_STAMODE_CONNECTED:
+			publishDNSName();
+            break;
+        case WIFI_EVENT_STAMODE_GOT_IP:
+			Serial.printf("IP address: %s\n", WiFi.localIP().toString().c_str());
+            break;
+        case WIFI_EVENT_STAMODE_DISCONNECTED:
+            break;
+        default:
+            break;
+    }
+
+#endif
 }
 
 //	work around for problem with lambda (see below)
@@ -770,7 +789,11 @@ void BolbroClass::publishDNSName() {
 		if (MDNS.begin(lowerAppName))
 			Serial.printf("MDNS responder started: '%s.local'\n", lowerAppName);
 
+#ifdef ESP_PLATFORM // ESP32
 		WiFi.setHostname(lowerAppName);
+#else
+		WiFi.hostname(lowerAppName);
+#endif
 	}
 }
 
